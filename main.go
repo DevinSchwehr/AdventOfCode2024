@@ -17,8 +17,5 @@ func main() {
 		log.Fatalf("invalid day value, must be 1 through 25 but got %v", day)
 	}
 
-	switch day {
-	case 1:
-		day1.Execute()
-	}
+	day1.Execute()
 }
