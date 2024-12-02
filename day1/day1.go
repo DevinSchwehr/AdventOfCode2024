@@ -14,19 +14,9 @@ import (
 func Execute() {
 
 	os.Chdir("day1")
-	firstFile, err := os.Open("input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	secondFile, err := os.Open("input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer firstFile.Close()
-	defer secondFile.Close()
 
-	partOneResult := partOne(secondFile)
-	partTwoResult := partTwo(firstFile)
+	partOneResult := partOne("input.txt")
+	partTwoResult := partTwo("input.txt")
 
 	fmt.Printf("Result for Part One is: %v \n", partOneResult)
 	fmt.Printf("Result for Part Two is: %v \n", partTwoResult)
@@ -48,7 +38,13 @@ func getInputsFromLine(s string) (int, int) {
 
 }
 
-func partOne(file *os.File) int {
+func partOne(filename string) int {
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 	var firstList []int
 	var secondList []int
@@ -75,7 +71,13 @@ func partOne(file *os.File) int {
 	return differences
 }
 
-func partTwo(file *os.File) int {
+func partTwo(filename string) int {
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
 	scanner := bufio.NewScanner(file)
 	m := make(map[int]int)
 
