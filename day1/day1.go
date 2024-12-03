@@ -31,7 +31,7 @@ func getInputsFromLine(s string) (int, int) {
 	secondNum, err2 := strconv.Atoi(inputs[1])
 
 	if err1 != nil || err2 != nil {
-		log.Fatal("error parsing integers: %v, %t", err1, err2)
+		log.Fatalf("error parsing integers: %v, %t", err1, err2)
 	}
 
 	return firstNum, secondNum
