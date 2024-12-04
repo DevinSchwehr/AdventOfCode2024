@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/DevinSchwehr/AdventOfCode2024/day1"
+	"github.com/DevinSchwehr/AdventOfCode2024/day2"
 )
 
 func main() {
@@ -17,5 +18,10 @@ func main() {
 		log.Fatalf("invalid day value, must be 1 through 25 but got %v", day)
 	}
 
-	day1.Execute()
+	switch day {
+	case 1:
+		day1.Execute()
+	case 2:
+		day2.Execute()
+	}
 }
