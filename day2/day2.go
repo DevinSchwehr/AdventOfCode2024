@@ -43,32 +43,36 @@ func partOne(filename string) int {
 			levelArray = append(levelArray, levelNumber)
 		}
 
-		isSafe := true
-
-		for index, value := range levelArray {
-			//Base cases
-			if index == 0 || index == len(levelArray)-1 {
-				continue
-			}
-			//check is increasing or decreasing
-			increasing := levelArray[index-1] < value && value < levelArray[index+1]
-			decreasing := levelArray[index-1] > value && value > levelArray[index+1]
-			prevDifference := math.Abs(float64(levelArray[index-1] - value))
-			nextDifference := math.Abs(float64(levelArray[index+1] - value))
-
-			isSafe = (increasing || decreasing) && (prevDifference <= 3 && nextDifference <= 3)
-
-			if !isSafe {
-				break
-			}
-
-		}
-		if isSafe {
+		if checkLevelSafe(levelArray) {
 			result++
 		}
 	}
 
 	return result
+}
+
+func checkLevelSafe(levelArray []int) bool {
+	isSafe := true
+
+	for index, value := range levelArray {
+		//Base cases
+		if index == 0 || index == len(levelArray)-1 {
+			continue
+		}
+		//check is increasing or decreasing
+		increasing := levelArray[index-1] < value && value < levelArray[index+1]
+		decreasing := levelArray[index-1] > value && value > levelArray[index+1]
+		prevDifference := math.Abs(float64(levelArray[index-1] - value))
+		nextDifference := math.Abs(float64(levelArray[index+1] - value))
+
+		isSafe = (increasing || decreasing) && (prevDifference <= 3 && nextDifference <= 3)
+
+		if !isSafe {
+			break
+		}
+
+	}
+	return isSafe
 }
 
 func partTwo(filename string) int {
@@ -94,146 +98,50 @@ func partTwo(filename string) int {
 		}
 
 		isSafe := true
-		removedIndex := -1
 
-		fmt.Println(levelArray)
+		if len(levelArray) == 1 {
+			result++
+			continue
+		}
 
-		firstValid, firstRemoved := checkFirstIndex(levelArray)
-		lastValid, lastRemoved := checkLastIndex(levelArray)
-		if firstValid && firstRemoved {
-			removedIndex = 0
-		}
-		if lastValid && lastRemoved {
-			removedIndex = len(levelArray) - 1
-		}
-		//if the first or last index is not removable, report is not valid
-		if !firstValid || !lastValid {
-			isSafe = false
-		} else {
-			for index, value := range levelArray {
-				//Middle Indexes
-				if index > 0 && index < len(levelArray)-1 && index != removedIndex {
-					prevIndex := index - 1
-					if removedIndex == prevIndex {
-						if removedIndex == 0 {
-							increasing := value < levelArray[index+1]
-							decreasing := value > levelArray[index+1]
-							validDifference := math.Abs(float64(value-levelArray[index+1])) <= 3
-							isSafe = (increasing || decreasing) && validDifference
-						} else {
-							prevIndex = removedIndex - 1
-							increasing := value > levelArray[prevIndex] && value < levelArray[index+1]
-							decreasing := value < levelArray[prevIndex] && value > levelArray[index+1]
-							validDifference := (math.Abs(float64(value-levelArray[prevIndex])) <= 3) &&
-								(math.Abs(float64(value-levelArray[index+1])) <= 3)
-							isSafe = (increasing || decreasing) && validDifference
-						}
-					} else if removedIndex == index+1 {
-						increasing := value < levelArray[index-1]
-						decreasing := value > levelArray[index-1]
-						validDifference := math.Abs(float64(value-levelArray[index-1])) <= 3
-						isSafe = (increasing || decreasing) && validDifference
-					} else {
-						increasing := value > levelArray[prevIndex] && value < levelArray[index+1]
-						decreasing := value < levelArray[prevIndex] && value > levelArray[index+1]
-						validDifference := (math.Abs(float64(value-levelArray[prevIndex])) <= 3) &&
-							(math.Abs(float64(value-levelArray[index+1])) <= 3)
-						isSafe = (increasing || decreasing) && validDifference
-					}
-					if !isSafe {
-						//Able to remove level?
-						if removedIndex == -1 {
-							removable :=
-								(levelArray[index-1] < levelArray[index+1] || levelArray[index-1] > levelArray[index+1]) &&
-									(math.Abs(float64(levelArray[index-1]-levelArray[index+1])) <= 3)
-							if removable {
-								isSafe = true
-								removedIndex = index
-							} else {
-								//Check if next element is breaking
-								nextRemovable := checkSkipNextValidity(index, levelArray)
-								if nextRemovable {
-									isSafe = true
-									removedIndex = index + 1
-								} else {
-									break
-								}
-							}
-						} else if removedIndex == index-1 {
-							//Check if removed index could be shifted by one
-							removable :=
-								(levelArray[index-1] < levelArray[index+1] || levelArray[index-1] > levelArray[index+1]) &&
-									(math.Abs(float64(levelArray[index-1]-levelArray[index+1])) <= 3)
-							if removable {
-								isSafe = true
-								removedIndex = index
-							}
-						} else {
-							break
-						}
-					}
-				}
+		if len(levelArray) == 2 {
+			increasing := levelArray[0] < levelArray[1]
+			decreasing := levelArray[0] > levelArray[1]
+			validDifference := math.Abs(float64(levelArray[0]-levelArray[1])) <= 3
+			if (increasing || decreasing) && validDifference {
+				result++
+				continue
 			}
 		}
 
-		fmt.Println(isSafe)
+		if !checkLevelSafe(levelArray) {
+			validWithRemove := false
+			for index, _ := range levelArray {
+				level := make([]int, len(levelArray))
+				copy(level, levelArray)
+				var slice []int
+				switch index {
+				case 0:
+					slice = level[1:]
+				case len(level) - 1:
+					slice = level[:index]
+				default:
+					first := level[:index]
+					second := level[index+1:]
+					slice = append(first, second...)
+				}
+				if checkLevelSafe(slice) {
+					validWithRemove = true
+					break
+				}
+			}
+			isSafe = validWithRemove
+		}
+
 		if isSafe {
 			result++
 		}
 	}
 
 	return result
-}
-
-func checkSkipNextValidity(index int, levelArray []int) bool {
-	if index+2 <= len(levelArray)-1 {
-		value := levelArray[index]
-		increasing := value > levelArray[index-1] && value < levelArray[index+2]
-		decreasing := value < levelArray[index-1] && value > levelArray[index+2]
-		validDifference := (math.Abs(float64(value-levelArray[index-1])) <= 3) &&
-			(math.Abs(float64(value-levelArray[index+2])) <= 3)
-		return (increasing || decreasing) && validDifference
-	}
-	return false
-}
-
-func checkLastIndex(levelArray []int) (bool, bool) {
-	removed := false
-	index := len(levelArray) - 1
-	value := levelArray[index]
-	increasing := value < levelArray[index-1]
-	decreasing := value > levelArray[index-1]
-	difference := math.Abs(float64(value - levelArray[index-1]))
-	isSafe := (increasing || decreasing) && difference <= 3
-	if !isSafe {
-		increasing = levelArray[index-2] < levelArray[index-1]
-		decreasing = levelArray[index-2] > levelArray[index-1]
-		difference = math.Abs(float64(levelArray[index-2] - levelArray[index-1]))
-		removable := (increasing || decreasing) && difference <= 3
-		if removable {
-			isSafe = true
-			removed = removable
-		}
-	}
-	return isSafe, removed
-}
-
-func checkFirstIndex(levelArray []int) (bool, bool) {
-	value := levelArray[0]
-	removed := false
-	increasing := value < levelArray[1]
-	decreasing := value > levelArray[1]
-	difference := math.Abs(float64(value - levelArray[1]))
-	isSafe := (increasing || decreasing) && difference <= 3
-	if !isSafe {
-		increasing = levelArray[1] < levelArray[2]
-		decreasing = levelArray[1] > levelArray[2]
-		difference = math.Abs(float64(levelArray[1] - levelArray[2]))
-		removable := (increasing || decreasing) && difference <= 3
-		if removable {
-			isSafe = true
-			removed = removable
-		}
-	}
-	return isSafe, removed
 }
