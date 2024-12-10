@@ -111,15 +111,15 @@ func canEqual(sum int, numbers []int, isPartOne bool) bool {
 
 	baseNode := createNode(numbers[0])
 	if isPartOne {
-		propagateTree(1, baseNode, numbers)
+		propagateTree(sum, 1, baseNode, numbers)
 	} else {
-		propagateTreePartTwo(1, baseNode, numbers)
+		propagateTreePartTwo(sum, 1, baseNode, numbers)
 	}
 
 	return findTarget(sum, baseNode, 1, numbers)
 }
 
-func propagateTree(index int, node *Node, numbers []int) {
+func propagateTree(target int, index int, node *Node, numbers []int) {
 	sumResult := node.value + numbers[index]
 	multResult := node.value * numbers[index]
 
@@ -134,15 +134,19 @@ func propagateTree(index int, node *Node, numbers []int) {
 	}
 	index++
 	addNode := createNode(sumResult)
-	propagateTree(index, addNode, numbers)
+	if addNode.value <= target {
+		propagateTree(target, index, addNode, numbers)
+	}
 	multNode := createNode(multResult)
-	propagateTree(index, multNode, numbers)
+	if multNode.value <= target {
+		propagateTree(target, index, multNode, numbers)
+	}
 	children := []*Node{addNode, multNode}
 	node.children = children
 
 }
 
-func propagateTreePartTwo(index int, node *Node, numbers []int) {
+func propagateTreePartTwo(target int, index int, node *Node, numbers []int) {
 	sumResult := node.value + numbers[index]
 	multResult := node.value * numbers[index]
 	concatResult := concatNumbers(node.value, numbers[index])
@@ -159,11 +163,17 @@ func propagateTreePartTwo(index int, node *Node, numbers []int) {
 	}
 	index++
 	addNode := createNode(sumResult)
-	propagateTreePartTwo(index, addNode, numbers)
+	if addNode.value <= target {
+		propagateTreePartTwo(target, index, addNode, numbers)
+	}
 	multNode := createNode(multResult)
-	propagateTreePartTwo(index, multNode, numbers)
+	if multNode.value <= target {
+		propagateTreePartTwo(target, index, multNode, numbers)
+	}
 	concatNode := createNode(concatResult)
-	propagateTreePartTwo(index, concatNode, numbers)
+	if concatNode.value <= target {
+		propagateTreePartTwo(target, index, concatNode, numbers)
+	}
 	children := []*Node{addNode, multNode, concatNode}
 	node.children = children
 }
