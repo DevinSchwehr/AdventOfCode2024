@@ -10,6 +10,7 @@ import (
 	"github.com/DevinSchwehr/AdventOfCode2024/day4"
 	"github.com/DevinSchwehr/AdventOfCode2024/day5"
 	"github.com/DevinSchwehr/AdventOfCode2024/day6"
+	"github.com/DevinSchwehr/AdventOfCode2024/day7"
 )
 
 func main() {
@@ -35,5 +36,7 @@ func main() {
 		day5.Execute()
 	case 6:
 		day6.Execute()
+	case 7:
+		day7.Execute()
 	}
 }
