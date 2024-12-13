@@ -162,126 +162,99 @@ func partTwo(filename string) int {
 	scanner := bufio.NewScanner(file)
 	scanner.Scan()
 	blocks := strings.Split(scanner.Text(), "")
-	var head *Node
-	// var tail *Node
-	var currNode *Node
-	currId := 0
-	for index, blockString := range blocks {
-		blockSize, err := strconv.Atoi(blockString)
-		if blockSize == 0 {
-			continue
-		}
+	var blockArray []string
+
+	blockVal := 0
+
+	for index, value := range blocks {
+		valueNum, err := strconv.Atoi(value)
 		if err != nil {
 			log.Fatal("error parsing int from string")
 		}
-		if index == 0 {
-			//Initial Block
-			head = newNode(strconv.Itoa(currId), nil, nil, blockSize)
-			currNode = head
-			currId++
-		} else if index%2 == 0 {
-			//File block
-			new := newNode(strconv.Itoa(currId), nil, currNode, blockSize)
-			currNode.next = new
-			currNode = new
-			currId++
+
+		if index%2 == 0 {
+			i := 0
+			for i < valueNum {
+				blockArray = append(blockArray, strconv.Itoa(blockVal))
+				i++
+			}
+			blockVal++
 		} else {
-			//free block
-			new := newNode(".", nil, currNode, blockSize)
-			currNode.next = new
-			currNode = new
+			i := 0
+			for i < valueNum {
+				blockArray = append(blockArray, ".")
+				i++
+			}
 		}
 	}
-	//CurrNode should be at the tail
-	for currNode != head {
-		if currNode.next != nil {
-			log.Printf("Node Next value: %s \n", currNode.next.value)
-		}
-		if currNode.prev != nil {
-			log.Printf("Node Prev value: %s \n", currNode.prev.value)
-		}
-		if currNode.value != "." {
-			//Find first free block
-			freeNode := head
-			noFreeSpace := false
-			for {
-				if freeNode.value == "." && freeNode.blockSize >= currNode.blockSize {
+	//List has been created
+	backIndex := len(blockArray) - 1
+
+	for backIndex > 0 {
+		if blockArray[backIndex] != "." {
+			blockSize := 0
+			blockStartIndex := backIndex
+			atStartOfArray := false
+			for blockArray[blockStartIndex] == blockArray[backIndex] {
+				if blockStartIndex == 0 {
+					atStartOfArray = true
 					break
 				}
-				freeNode = freeNode.next
-				// could not find enough free space
-				if freeNode == currNode {
-					noFreeSpace = true
+				blockSize++
+				blockStartIndex--
+			}
+			if atStartOfArray {
+				break
+			}
+			//Get back to start of block
+			blockStartIndex++
+			//Find if there is a free space that can accomodate block
+			for index, value := range blockArray {
+				if index == blockStartIndex {
+					break
+				}
+				if value != "." {
+					continue
+				}
+				freeBlockStartIndex := index
+				freeBlockSize := 0
+				tempIndex := freeBlockStartIndex
+				for blockArray[tempIndex] == "." {
+					freeBlockSize++
+					tempIndex++
+				}
+				//Found free block that is big enough to accomodate
+				if freeBlockSize >= blockSize {
+					blockIndex := blockStartIndex
+					swapCounter := 0
+					for swapCounter < blockSize {
+						tempValue := blockArray[blockIndex]
+						blockArray[blockIndex] = blockArray[freeBlockStartIndex]
+						blockArray[freeBlockStartIndex] = tempValue
+						blockIndex++
+						freeBlockStartIndex++
+						swapCounter++
+					}
 					break
 				}
 			}
-			if noFreeSpace {
-				currNode = currNode.prev
-				continue
-			}
-			//found free block that has enough size for new block
-			//Swap node positions
-			tempNode := *currNode
-			difference := freeNode.blockSize - currNode.blockSize
-			//if there is remaining free space
-			if difference > 0 {
-				remainderNode := newNode(".", freeNode.next, currNode, difference)
-				currNode.next = remainderNode
-				currNode.prev = freeNode.prev
-				if freeNode.prev != nil {
-					freeNode.prev.next = currNode
-				}
-				if freeNode.next != nil {
-					freeNode.next.prev = remainderNode
-				}
-
-			} else {
-				currNode.next = freeNode.next
-				currNode.prev = freeNode.prev
-				if freeNode.prev != nil {
-					freeNode.prev.next = currNode
-				}
-				if freeNode.next != nil {
-					freeNode.next.prev = currNode
-				}
-			}
-
-			freeNode.prev = tempNode.prev
-			freeNode.next = tempNode.next
-			freeNode.blockSize = currNode.blockSize
-			if tempNode.prev != nil {
-				tempNode.prev.next = freeNode
-			}
-			if tempNode.next != nil {
-				tempNode.next.prev = freeNode
-			}
-			currNode = freeNode
-		} else {
-			currNode = currNode.prev
+			//Regardless of if it moves, go to the start of this block to move to the next one
+			backIndex = blockStartIndex
 		}
+
+		backIndex--
 	}
 
-	printLinkedList(head)
 	result := 0
-	curr := head
-	index := 0
-	for curr != nil {
-		if curr.value != "." {
-			number, err := strconv.Atoi(curr.value)
+	for index, value := range blockArray {
+		if value != "." {
+			valueNum, err := strconv.Atoi(value)
 			if err != nil {
-				log.Fatal("Error parsing int from string")
+				log.Fatal("error parsing int")
 			}
-			blockIndex := 0
-			for blockIndex < curr.blockSize {
-				result += (number * (blockIndex + index))
-				blockIndex++
-			}
-			index += curr.blockSize
-		} else {
-			index += curr.blockSize
+			result += valueNum * index
 		}
-		curr = curr.next
 	}
-
 	return result
+
 }

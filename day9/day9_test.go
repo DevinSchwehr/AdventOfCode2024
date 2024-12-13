@@ -12,7 +12,7 @@ func TestPartOne(t *testing.T) {
 
 func TestPartTwo(t *testing.T) {
 	want := 2858
-	result := partTwo("input.txt")
+	result := partTwo("test.txt")
 	if result != want {
 		t.Fatalf(`Did not get expected result. Expected %d, received %d`, want, result)
 	}
