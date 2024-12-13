@@ -127,19 +127,19 @@ func partOne(filename string) int {
 	return result
 }
 
-func printLinkedList(head *Node) {
-	printString := ""
-	currNode := head
-	for currNode != nil {
-		printIndex := 0
-		for printIndex < currNode.blockSize {
-			printString += currNode.value
-			printIndex++
-		}
-		currNode = currNode.next
-	}
-	log.Println(printString)
-}
+// func printLinkedList(head *Node) {
+// 	printString := ""
+// 	currNode := head
+// 	for currNode != nil {
+// 		printIndex := 0
+// 		for printIndex < currNode.blockSize {
+// 			printString += currNode.value
+// 			printIndex++
+// 		}
+// 		currNode = currNode.next
+// 	}
+// 	log.Println(printString)
+// }
 
 func advanceLinkedList(currNode *Node, value string, blockSize int) *Node {
 	currIncrement := 0

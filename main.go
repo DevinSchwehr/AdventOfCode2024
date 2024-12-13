@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/DevinSchwehr/AdventOfCode2024/day1"
+	"github.com/DevinSchwehr/AdventOfCode2024/day10"
 	"github.com/DevinSchwehr/AdventOfCode2024/day2"
 	"github.com/DevinSchwehr/AdventOfCode2024/day3"
 	"github.com/DevinSchwehr/AdventOfCode2024/day4"
@@ -44,5 +45,7 @@ func main() {
 		day8.Execute()
 	case 9:
 		day9.Execute()
+	case 10:
+		day10.Execute()
 	}
 }
